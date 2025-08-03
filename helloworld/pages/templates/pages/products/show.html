@@ -1,6 +1,7 @@
 {% extends 'pages/base.html' %}
 {% block title %} {{title}} {% endblock %}
 {% block header_title %} {{subtitle}} {% endblock %}
+
 {% block content %}
 <div class="card mb-3">
   <div class="row g-0">
@@ -13,15 +14,14 @@
           {{product.name}}
         </h5>
         <p class="card-text">{{product.description}}</p>
-        {% if product.price > 100 %}
-          <p class="card-text" style="color: red;">
-            Price: ${{product.price}}
-          </p>
+        {% if product.price > 2000 %}
+          <p class="card-text" style="color: red;">{{product.price}}</p>
         {% else %}
-          <p class="card-text" style="color: black;">
-            Price: ${{product.price}}
-          </p>
+          <p class="card-text">{{product.price}}</p>
         {% endif %}
+        {% for comment in product.comment_set.all %} 
+        - {{ comment.description }}<br /> 
+        {% endfor %}
       </div>
     </div>
   </div>
