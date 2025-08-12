@@ -7,5 +7,5 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 class Comment(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, related_name='coments', on_delete=models.CASCADE)
     description = models.TextField()
