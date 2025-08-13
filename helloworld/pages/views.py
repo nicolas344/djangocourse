@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.views import View
 from django import forms
 from django.core.exceptions import ValidationError
+from .utils import ImageLocalStorage
 from .models import Product
 from django.urls import reverse
 from django.contrib import messages
@@ -31,7 +32,7 @@ class AboutPageView(TemplateView):
         return context
 
 class ProductIndexView(View): 
-    template_name = 'pages/products/index.html' 
+    template_name = 'products/index.html' 
  
     def get(self, request): 
         viewData = {} 
@@ -42,7 +43,7 @@ class ProductIndexView(View):
         return render(request, self.template_name, viewData) 
  
 class ProductShowView(View): 
-    template_name = 'pages/products/show.html' 
+    template_name = 'products/show.html' 
  
  
     def get(self, request, id): 
@@ -88,7 +89,7 @@ class ProductForm(forms.ModelForm):
  
  
 class ProductCreateView(View): 
-    template_name = 'pages/products/create.html' 
+    template_name = 'products/create.html' 
  
     def get(self, request): 
         form = ProductForm() 
@@ -111,7 +112,7 @@ class ProductCreateView(View):
             return render(request, self.template_name, viewData)
         
 class CartView(View):
-    template_name = 'pages/cart/index.html'
+    template_name = 'cart/index.html'
 
     def get(self, request): 
         # Simulated database for products 
@@ -153,3 +154,30 @@ class CartRemoveAllView(View):
             del request.session['cart_product_data'] 
 
         return redirect('cart_index')
+    
+def ImageViewFactory(image_storage): 
+    class ImageView(View): 
+        template_name = 'images/index.html' 
+ 
+        def get(self, request): 
+            image_url = request.session.get('image_url', '') 
+            return render(request, self.template_name, {'image_url': image_url}) 
+ 
+        def post(self, request): 
+            image_url = image_storage.store(request) 
+            request.session['image_url'] = image_url 
+            return redirect('image_index') 
+    return ImageView
+    
+class ImageViewNoDI(View): 
+    template_name = 'images/index.html' 
+    
+    def get(self, request): 
+        image_url = request.session.get('image_url', '') 
+        return render(request, self.template_name, {'image_url': image_url}) 
+        
+    def post(self, request): 
+        image_storage = ImageLocalStorage() 
+        image_url = image_storage.store(request) 
+        request.session['image_url'] = image_url 
+        return redirect('image_index')
