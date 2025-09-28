@@ -9,18 +9,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Docker Login
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKER_PASS: ${{ secrets.DOCKERHUB_PASS }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_PASS }}   # o DOCKERHUB_TOKEN si así lo llamaste
         run: |
-          docker login -u $DOCKER_USER -p $DOCKER_PASS
+          echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
       - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag nicolasrico4/express-randomquotes:latest
+        run: |
+          docker build randomquotes \
+            --file randomquotes/Dockerfile \
+            --tag nicolasrico4/express-randomquotes:latest
 
-      - name: Docker Push
-        run: docker push nicolasrico4/express-randomquotes:latest
+      - name: Push Docker image
+        run: |
+          docker push nicolasrico4/express-randomquotes:latest
